@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CEO Alignment Survey — Salt &amp; Stone</title>
+<title>CEO Alignment Survey — Project Leila</title>
 <style>
 :root {
   --navy: #1a2332; --blue: #2c3e6b; --accent: #4a90d9;
@@ -49,16 +49,33 @@ header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
 .bar-bg { height: 5px; background: #eef; border-radius: 3px; margin-bottom: .4rem; }
 .bar-fg { height: 100%; border-radius: 3px; transition: width .5s ease; }
 .dim-desc { font-size: .85rem; color: var(--muted); font-weight: 500; }
+#gate { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh; }
+#gate .card { max-width: 380px; width: 100%; text-align: center; }
+#gate h2 { font-size: 1.2rem; color: var(--blue); margin-bottom: 1rem; }
+#gate .gate-input { width: 100%; padding: .65rem 1rem; border: 1.5px solid #dde; border-radius: 8px; font-size: .95rem; font-family: inherit; text-align: center; margin-bottom: .75rem; }
+#gate .gate-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,144,217,.15); }
+#gate .gate-err { color: var(--red); font-size: .85rem; margin-top: .5rem; display: none; }
+#content { display: none; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>CEO Alignment Survey</h1>
-  <p>Salt &amp; Stone</p>
+  <p>Project Leila</p>
 </header>
 
 <div class="container">
+  <div id="gate">
+    <div class="card">
+      <h2>Enter Access Code</h2>
+      <input class="gate-input" type="password" id="passcode" placeholder="Access code">
+      <button class="btn" id="gateBtn" type="button">Enter</button>
+      <div class="gate-err" id="gateErr">Incorrect code. Please try again.</div>
+    </div>
+  </div>
+
+  <div id="content">
   <form id="survey"></form>
 
   <button class="btn" id="submitBtn" type="button">Submit Survey</button>
@@ -72,9 +89,22 @@ header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
     </div>
     <div class="card" id="dimScores"></div>
   </div>
+  </div>
 </div>
 
 <script>
+const PASSCODE = 'Neroliandbasil';
+document.getElementById('gateBtn').addEventListener('click', checkCode);
+document.getElementById('passcode').addEventListener('keydown', e => { if (e.key === 'Enter') checkCode(); });
+function checkCode() {
+  if (document.getElementById('passcode').value === PASSCODE) {
+    document.getElementById('gate').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+  } else {
+    document.getElementById('gateErr').style.display = 'block';
+  }
+}
+
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbIz-7O7sp4sA6ArM1fRcodKmkayKk590WOT0H-nHcWMi-fTwwOy6SoIs8sV7o96hSqw/exec';
 
 const DIMS = [
@@ -149,7 +179,7 @@ async function sendToSheets(scores, overall) {
   if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return 'no-url';
   try {
     const payload = {
-      company: 'Salt & Stone',
+      company: 'Project Leila',
       overall: +overall.toFixed(2),
       dimensions: scores.map(d => ({
         name: d.name,
