@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PE Human Capital — Alignment Survey</title>
+<style>
+:root {
+  --navy: #1a2332; --blue: #2c3e6b; --accent: #4a90d9;
+  --green: #27ae60; --yellow: #f39c12; --red: #e74c3c;
+  --bg: #f4f6f9; --card: #fff; --text: #2c3e50; --muted: #7f8c8d;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
+header { background: linear-gradient(135deg, var(--navy), var(--blue)); color: #fff; padding: 2rem; text-align: center; }
+header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; }
+header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
+.container { max-width: 860px; margin: 0 auto; padding: 1.5rem; }
+.card { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+.field-label { font-size: .9rem; font-weight: 600; margin-bottom: .4rem; display: block; }
+.text-input { width: 100%; padding: .65rem 1rem; border: 1.5px solid #dde; border-radius: 8px; font-size: .95rem; font-family: inherit; }
+.text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,144,217,.15); }
+.dim-title { font-size: 1.1rem; font-weight: 700; color: var(--blue); margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: .5rem; }
+.dim-num { background: var(--accent); color: #fff; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
+.question { margin-bottom: 1.1rem; }
+.question:last-child { margin-bottom: 0; }
+.q-label { display: block; font-size: .88rem; margin-bottom: .4rem; font-weight: 500; }
+.rating-group { display: flex; gap: .4rem; }
+.rating-group input[type="radio"] { display: none; }
+.rating-group label { width: 38px; height: 34px; display: flex; align-items: center; justify-content: center; border: 2px solid #dde; border-radius: 7px; cursor: pointer; font-weight: 600; font-size: .85rem; transition: all .15s; user-select: none; }
+.rating-group input:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; }
+.rating-group label:hover { border-color: var(--accent); background: rgba(74,144,217,.08); }
+.scale-hint { display: flex; justify-content: space-between; width: 214px; font-size: .7rem; color: var(--muted); margin-top: .15rem; }
+.btn { background: linear-gradient(135deg, var(--accent), var(--blue)); color: #fff; border: none; padding: .85rem 2rem; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; display: block; width: 100%; transition: opacity .2s; font-family: inherit; }
+.btn:hover { opacity: .9; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.status-msg { text-align: center; padding: .75rem; border-radius: 8px; margin: 1rem 0; font-size: .9rem; font-weight: 500; }
+.status-msg.ok { background: #d4edda; color: #155724; }
+.status-msg.err { background: #f8d7da; color: #721c24; }
+#scorecard { display: none; animation: fadeUp .4s ease; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+.overall-box { text-align: center; padding: 1.5rem; }
+.overall-box .score-num { font-size: 3.5rem; font-weight: 800; line-height: 1; }
+.overall-box .score-lbl { font-size: .9rem; color: var(--muted); margin-bottom: .25rem; text-transform: uppercase; letter-spacing: .06em; }
+.overall-box .score-desc { font-size: 1rem; font-weight: 600; margin-top: .5rem; }
+.dim-row { display: flex; align-items: flex-start; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #eef; }
+.dim-row:last-child { border-bottom: none; }
+.badge { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.05rem; color: #fff; flex-shrink: 0; }
+.badge.r { background: var(--red); } .badge.y { background: var(--yellow); } .badge.g { background: var(--green); }
+.dim-body { flex: 1; min-width: 0; }
+.dim-body h3 { font-size: .95rem; margin-bottom: .3rem; }
+.bar-bg { height: 5px; background: #eef; border-radius: 3px; margin-bottom: .4rem; }
+.bar-fg { height: 100%; border-radius: 3px; transition: width .5s ease; }
+.dim-desc { font-size: .85rem; color: var(--muted); font-weight: 500; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Alignment Survey</h1>
+  <p>Private Equity &middot; Human Capital Assessment</p>
+</header>
+
+<div class="container">
+  <div class="card">
+    <label class="field-label" for="company">Company / Project Name</label>
+    <input class="text-input" type="text" id="company" placeholder="e.g. Acme Corp — Q1 Assessment" required>
+  </div>
+
+  <form id="survey"></form>
+
+  <button class="btn" id="submitBtn" type="button">Submit Survey</button>
+  <div id="status"></div>
+
+  <div id="scorecard">
+    <div class="card overall-box">
+      <div class="score-lbl">Overall Alignment Score</div>
+      <div class="score-num" id="overallScore">—</div>
+      <div class="score-desc" id="overallDesc"></div>
+    </div>
+    <div class="card" id="dimScores"></div>
+  </div>
+</div>
+
+<script>
+// ── PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW ──
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbIz-7O7sp4sA6ArM1fRcodKmkayKk590WOT0H-nHcWMi-fTwwOy6SoIs8sV7o96hSqw/exec';
+
+const DIMS = [
+  { id:'leadership', name:'Leadership Alignment', qs:[
+    'Senior leaders share a common vision for the company\'s future',
+    'Leadership decisions are consistent with stated strategic priorities',
+    'Leaders communicate effectively across all levels',
+    'Strong alignment exists between the board, CEO, and management team'
+  ]},
+  { id:'strategy', name:'Strategic Clarity', qs:[
+    'The value creation plan is clearly defined and understood',
+    'Key strategic priorities are well-communicated to stakeholders',
+    'Clear metrics and milestones are tied to strategic goals',
+    'Resource allocation reflects strategic priorities'
+  ]},
+  { id:'talent', name:'Talent & Org Structure', qs:[
+    'The organization has the right leaders in the right roles',
+    'Succession planning is in place for critical positions',
+    'The org structure supports efficient decision-making',
+    'Compensation and incentives align with value creation goals'
+  ]},
+  { id:'culture', name:'Culture & Engagement', qs:[
+    'A strong culture of accountability and ownership exists',
+    'Employee engagement levels support high performance',
+    'The organization adapts well to change and new initiatives',
+    'Cross-functional collaboration is effective'
+  ]},
+  { id:'execution', name:'Execution & Accountability', qs:[
+    'Operational KPIs are tracked and reviewed regularly',
+    'Teams consistently deliver on commitments and deadlines',
+    'Clear escalation paths exist when issues arise',
+    'Performance management processes drive results'
+  ]}
+];
+
+// Render survey
+document.getElementById('survey').innerHTML = DIMS.map((d, di) => `
+  <div class="card">
+    <div class="dim-title"><span class="dim-num">${di+1}</span>${d.name}</div>
+    ${d.qs.map((q, qi) => `
+      <div class="question">
+        <span class="q-label">${q}</span>
+        <div class="rating-group">
+          ${[1,2,3,4,5].map(v => `<input type="radio" name="${d.id}_${qi}" id="${d.id}_${qi}_${v}" value="${v}" required><label for="${d.id}_${qi}_${v}">${v}</label>`).join('')}
+        </div>
+        ${qi === 0 ? '<div class="scale-hint"><span>Strongly Disagree</span><span>Strongly Agree</span></div>' : ''}
+      </div>
+    `).join('')}
+  </div>
+`).join('');
+
+function collect() {
+  const out = [];
+  for (const d of DIMS) {
+    const vals = [];
+    for (let i = 0; i < d.qs.length; i++) {
+      const el = document.querySelector(`input[name="${d.id}_${i}"]:checked`);
+      if (!el) return null;
+      vals.push(+el.value);
+    }
+    out.push({ id: d.id, name: d.name, qs: d.qs, vals, avg: +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(2) });
+  }
+  return out;
+}
+
+function clr(s) { return s < 2.5 ? 'r' : s < 3.8 ? 'y' : 'g'; }
+function css(s) { return s < 2.5 ? 'var(--red)' : s < 3.8 ? 'var(--yellow)' : 'var(--green)'; }
+function desc(s) {
+  if (s < 1.5) return 'Critical — Immediate Action Needed';
+  if (s < 2.5) return 'Needs Significant Attention';
+  if (s < 3.0) return 'Below Target';
+  if (s < 3.8) return 'Moderate — Room for Improvement';
+  if (s < 4.5) return 'Strong Alignment';
+  return 'Excellent Alignment';
+}
+
+async function sendToSheets(scores, overall, company) {
+  if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return 'no-url';
+  try {
+    const payload = {
+      company,
+      overall: +overall.toFixed(2),
+      dimensions: scores.map(d => ({
+        name: d.name,
+        questions: d.qs,
+        scores: d.vals,
+        avg: d.avg
+      }))
+    };
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload)
+    });
+    return 'ok';
+  } catch {
+    return 'error';
+  }
+}
+
+document.getElementById('submitBtn').addEventListener('click', async () => {
+  const company = document.getElementById('company').value.trim();
+  if (!company) return alert('Please enter a company or project name.');
+  const scores = collect();
+  if (!scores) return alert('Please answer all questions.');
+
+  const btn = document.getElementById('submitBtn');
+  const statusEl = document.getElementById('status');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+  statusEl.innerHTML = '';
+
+  const overall = scores.reduce((s, d) => s + d.avg, 0) / scores.length;
+
+  // Show scorecard
+  const sc = document.getElementById('scorecard');
+  sc.style.display = 'block';
+  document.getElementById('overallScore').textContent = overall.toFixed(1);
+  document.getElementById('overallScore').style.color = css(overall);
+  document.getElementById('overallDesc').textContent = desc(overall);
+  document.getElementById('overallDesc').style.color = css(overall);
+
+  document.getElementById('dimScores').innerHTML = scores.map(d => `
+    <div class="dim-row">
+      <div class="badge ${clr(d.avg)}">${d.avg.toFixed(1)}</div>
+      <div class="dim-body">
+        <h3>${d.name}</h3>
+        <div class="bar-bg"><div class="bar-fg" style="width:${(d.avg/5)*100}%;background:${css(d.avg)}"></div></div>
+        <div class="dim-desc">${desc(d.avg)}</div>
+      </div>
+    </div>
+  `).join('');
+
+  sc.scrollIntoView({ behavior: 'smooth' });
+
+  // Send to Google Sheets
+  const result = await sendToSheets(scores, overall, company);
+  if (result === 'ok') {
+    statusEl.innerHTML = '<div class="status-msg ok">Response saved successfully.</div>';
+  } else if (result === 'no-url') {
+    statusEl.innerHTML = '<div class="status-msg err">Google Sheets not connected — update SCRIPT_URL in the HTML file.</div>';
+  } else {
+    statusEl.innerHTML = '<div class="status-msg err">Could not save to Google Sheets. Your scorecard is still shown below.</div>';
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Submit Again';
+});
+</script>
+</body>
+</html>
