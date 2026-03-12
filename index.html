@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PE Human Capital — Alignment Survey</title>
+<title>CEO Alignment Survey — Salt &amp; Stone</title>
 <style>
 :root {
   --navy: #1a2332; --blue: #2c3e6b; --accent: #4a90d9;
@@ -17,20 +17,17 @@ header h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.02em; }
 header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
 .container { max-width: 860px; margin: 0 auto; padding: 1.5rem; }
 .card { background: var(--card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
-.field-label { font-size: .9rem; font-weight: 600; margin-bottom: .4rem; display: block; }
-.text-input { width: 100%; padding: .65rem 1rem; border: 1.5px solid #dde; border-radius: 8px; font-size: .95rem; font-family: inherit; }
-.text-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,144,217,.15); }
 .dim-title { font-size: 1.1rem; font-weight: 700; color: var(--blue); margin-bottom: 1rem; padding-bottom: .5rem; border-bottom: 2px solid var(--accent); display: flex; align-items: center; gap: .5rem; }
 .dim-num { background: var(--accent); color: #fff; width: 26px; height: 26px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: .8rem; flex-shrink: 0; }
 .question { margin-bottom: 1.1rem; }
 .question:last-child { margin-bottom: 0; }
 .q-label { display: block; font-size: .88rem; margin-bottom: .4rem; font-weight: 500; }
+.q-scale { display: block; font-size: .75rem; color: var(--muted); margin-bottom: .4rem; font-style: italic; }
 .rating-group { display: flex; gap: .4rem; }
 .rating-group input[type="radio"] { display: none; }
 .rating-group label { width: 38px; height: 34px; display: flex; align-items: center; justify-content: center; border: 2px solid #dde; border-radius: 7px; cursor: pointer; font-weight: 600; font-size: .85rem; transition: all .15s; user-select: none; }
 .rating-group input:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; }
 .rating-group label:hover { border-color: var(--accent); background: rgba(74,144,217,.08); }
-.scale-hint { display: flex; justify-content: space-between; width: 214px; font-size: .7rem; color: var(--muted); margin-top: .15rem; }
 .btn { background: linear-gradient(135deg, var(--accent), var(--blue)); color: #fff; border: none; padding: .85rem 2rem; border-radius: 10px; font-size: 1rem; font-weight: 600; cursor: pointer; display: block; width: 100%; transition: opacity .2s; font-family: inherit; }
 .btn:hover { opacity: .9; }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -57,16 +54,11 @@ header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
 <body>
 
 <header>
-  <h1>Alignment Survey</h1>
-  <p>Private Equity &middot; Human Capital Assessment</p>
+  <h1>CEO Alignment Survey</h1>
+  <p>Salt &amp; Stone</p>
 </header>
 
 <div class="container">
-  <div class="card">
-    <label class="field-label" for="company">Company / Project Name</label>
-    <input class="text-input" type="text" id="company" placeholder="e.g. Acme Corp — Q1 Assessment" required>
-  </div>
-
   <form id="survey"></form>
 
   <button class="btn" id="submitBtn" type="button">Submit Survey</button>
@@ -74,8 +66,8 @@ header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
 
   <div id="scorecard">
     <div class="card overall-box">
-      <div class="score-lbl">Overall Alignment Score</div>
-      <div class="score-num" id="overallScore">—</div>
+      <div class="score-lbl">Overall Score</div>
+      <div class="score-num" id="overallScore">&mdash;</div>
       <div class="score-desc" id="overallDesc"></div>
     </div>
     <div class="card" id="dimScores"></div>
@@ -83,39 +75,35 @@ header p { opacity: 0.75; margin-top: 0.3rem; font-size: 0.95rem; }
 </div>
 
 <script>
-// ── PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BELOW ──
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwbIz-7O7sp4sA6ArM1fRcodKmkayKk590WOT0H-nHcWMi-fTwwOy6SoIs8sV7o96hSqw/exec';
 
 const DIMS = [
-  { id:'leadership', name:'Leadership Alignment', qs:[
-    'Senior leaders share a common vision for the company\'s future',
-    'Leadership decisions are consistent with stated strategic priorities',
-    'Leaders communicate effectively across all levels',
-    'Strong alignment exists between the board, CEO, and management team'
+  { id:'priorities', name:'Business Priorities', qs:[
+    { text:'Operational Improvement Required', scale:'1 = Steadily \u00b7 3 = Significant' },
+    { text:'Leadership Team Change (First 12 Mo.)', scale:'1 = Targeted Adjustments \u00b7 3 = Complete Overhaul' },
+    { text:'CEO Transformation Drive Required', scale:'1 = Relatively Minor \u00b7 3 = Considerable' },
+    { text:'Strategic Improvement Required', scale:'1 = Thoughtful Adjustments \u00b7 3 = Substantial Change' },
+    { text:'Leadership Characteristic Preference', scale:'1 = Operational Excellence \u00b7 3 = Strategic Foresight' }
   ]},
-  { id:'strategy', name:'Strategic Clarity', qs:[
-    'The value creation plan is clearly defined and understood',
-    'Key strategic priorities are well-communicated to stakeholders',
-    'Clear metrics and milestones are tied to strategic goals',
-    'Resource allocation reflects strategic priorities'
+  { id:'competencies', name:'Competencies', qs:[
+    { text:'CEO Experience', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Industry Experience (Beauty/PC)', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Brand Building Experience', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Growth at Scale (~$166M\u2192$500M)', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Commercial Acumen (GTM)', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'PE-Backed Experience', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Financial Acumen', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Operational Acumen (Supply Chain)', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Product Development Acumen', scale:'1 = Nice to Have \u00b7 3 = Must Have' }
   ]},
-  { id:'talent', name:'Talent & Org Structure', qs:[
-    'The organization has the right leaders in the right roles',
-    'Succession planning is in place for critical positions',
-    'The org structure supports efficient decision-making',
-    'Compensation and incentives align with value creation goals'
-  ]},
-  { id:'culture', name:'Culture & Engagement', qs:[
-    'A strong culture of accountability and ownership exists',
-    'Employee engagement levels support high performance',
-    'The organization adapts well to change and new initiatives',
-    'Cross-functional collaboration is effective'
-  ]},
-  { id:'execution', name:'Execution & Accountability', qs:[
-    'Operational KPIs are tracked and reviewed regularly',
-    'Teams consistently deliver on commitments and deadlines',
-    'Clear escalation paths exist when issues arise',
-    'Performance management processes drive results'
+  { id:'outcomes', name:'Outcomes', qs:[
+    { text:'Sharpen Brand Distinctiveness', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Build High-Performing ELT', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Stakeholder Relationship (Founder/Advent)', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Expand Retail Presence', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Grow Core Digital Business', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Expand Product Portfolio', scale:'1 = Nice to Have \u00b7 3 = Must Have' },
+    { text:'Enable International Expansion', scale:'1 = Nice to Have \u00b7 3 = Must Have' }
   ]}
 ];
 
@@ -125,11 +113,11 @@ document.getElementById('survey').innerHTML = DIMS.map((d, di) => `
     <div class="dim-title"><span class="dim-num">${di+1}</span>${d.name}</div>
     ${d.qs.map((q, qi) => `
       <div class="question">
-        <span class="q-label">${q}</span>
+        <span class="q-label">${q.text}</span>
+        <span class="q-scale">${q.scale}</span>
         <div class="rating-group">
-          ${[1,2,3,4,5].map(v => `<input type="radio" name="${d.id}_${qi}" id="${d.id}_${qi}_${v}" value="${v}" required><label for="${d.id}_${qi}_${v}">${v}</label>`).join('')}
+          ${[1,2,3].map(v => `<input type="radio" name="${d.id}_${qi}" id="${d.id}_${qi}_${v}" value="${v}" required><label for="${d.id}_${qi}_${v}">${v}</label>`).join('')}
         </div>
-        ${qi === 0 ? '<div class="scale-hint"><span>Strongly Disagree</span><span>Strongly Agree</span></div>' : ''}
       </div>
     `).join('')}
   </div>
@@ -144,27 +132,24 @@ function collect() {
       if (!el) return null;
       vals.push(+el.value);
     }
-    out.push({ id: d.id, name: d.name, qs: d.qs, vals, avg: +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(2) });
+    out.push({ id: d.id, name: d.name, qs: d.qs.map(q => q.text), vals, avg: +(vals.reduce((a,b) => a+b,0) / vals.length).toFixed(2) });
   }
   return out;
 }
 
-function clr(s) { return s < 2.5 ? 'r' : s < 3.8 ? 'y' : 'g'; }
-function css(s) { return s < 2.5 ? 'var(--red)' : s < 3.8 ? 'var(--yellow)' : 'var(--green)'; }
+function clr(s) { return s < 1.5 ? 'r' : s < 2.3 ? 'y' : 'g'; }
+function css(s) { return s < 1.5 ? 'var(--red)' : s < 2.3 ? 'var(--yellow)' : 'var(--green)'; }
 function desc(s) {
-  if (s < 1.5) return 'Critical — Immediate Action Needed';
-  if (s < 2.5) return 'Needs Significant Attention';
-  if (s < 3.0) return 'Below Target';
-  if (s < 3.8) return 'Moderate — Room for Improvement';
-  if (s < 4.5) return 'Strong Alignment';
-  return 'Excellent Alignment';
+  if (s < 1.5) return 'Low Priority / Minimal Change';
+  if (s < 2.3) return 'Moderate Priority';
+  return 'High Priority / Significant';
 }
 
-async function sendToSheets(scores, overall, company) {
+async function sendToSheets(scores, overall) {
   if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_URL_HERE') return 'no-url';
   try {
     const payload = {
-      company,
+      company: 'Salt & Stone',
       overall: +overall.toFixed(2),
       dimensions: scores.map(d => ({
         name: d.name,
@@ -186,8 +171,6 @@ async function sendToSheets(scores, overall, company) {
 }
 
 document.getElementById('submitBtn').addEventListener('click', async () => {
-  const company = document.getElementById('company').value.trim();
-  if (!company) return alert('Please enter a company or project name.');
   const scores = collect();
   if (!scores) return alert('Please answer all questions.');
 
@@ -199,7 +182,6 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
 
   const overall = scores.reduce((s, d) => s + d.avg, 0) / scores.length;
 
-  // Show scorecard
   const sc = document.getElementById('scorecard');
   sc.style.display = 'block';
   document.getElementById('overallScore').textContent = overall.toFixed(1);
@@ -212,7 +194,7 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
       <div class="badge ${clr(d.avg)}">${d.avg.toFixed(1)}</div>
       <div class="dim-body">
         <h3>${d.name}</h3>
-        <div class="bar-bg"><div class="bar-fg" style="width:${(d.avg/5)*100}%;background:${css(d.avg)}"></div></div>
+        <div class="bar-bg"><div class="bar-fg" style="width:${(d.avg/3)*100}%;background:${css(d.avg)}"></div></div>
         <div class="dim-desc">${desc(d.avg)}</div>
       </div>
     </div>
@@ -220,12 +202,11 @@ document.getElementById('submitBtn').addEventListener('click', async () => {
 
   sc.scrollIntoView({ behavior: 'smooth' });
 
-  // Send to Google Sheets
-  const result = await sendToSheets(scores, overall, company);
+  const result = await sendToSheets(scores, overall);
   if (result === 'ok') {
     statusEl.innerHTML = '<div class="status-msg ok">Response saved successfully.</div>';
   } else if (result === 'no-url') {
-    statusEl.innerHTML = '<div class="status-msg err">Google Sheets not connected — update SCRIPT_URL in the HTML file.</div>';
+    statusEl.innerHTML = '<div class="status-msg err">Google Sheets not connected.</div>';
   } else {
     statusEl.innerHTML = '<div class="status-msg err">Could not save to Google Sheets. Your scorecard is still shown below.</div>';
   }
